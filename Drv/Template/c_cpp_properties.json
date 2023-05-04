@@ -1,0 +1,51 @@
+{
+    //https://github.com/microsoft/vscode-cpptools/issues/5588
+
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}",
+                "/usr/include",
+                "/usr/local/include",
+                "/usr/src/linux-headers-5.19.0-41-generic/include",
+                "/usr/src/linux-headers-5.19.0-41-generic/include/generated",
+                "/usr/src/linux-headers-5.19.0-41-generic/include/uapi",
+                "/usr/src/linux-headers-5.19.0-41-generic/include/generated/uapi",
+                "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include",
+                "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include/generated",
+                "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include/uapi",
+                "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include/generated/uapi",
+                "/usr/src/linux-headers-5.19.0-41-generic/ubuntu/include",
+                "/usr/lib/gcc/x86_64-linux-gnu/11/include"
+            ],
+            "defines": [
+                "__GNUC__",
+                "__KERNEL__",
+                "MODULE"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "/usr/src/linux-headers-5.19.0-41-generic/include",
+                    "/usr/src/linux-headers-5.19.0-41-generic/mm",
+                    "/usr/src/linux-headers-5.19.0-41-generic/fs",
+                    "/usr/src/linux-headers-5.19.0-41-generic/kernel"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+
+            "compilerArgs": [
+                "-nostdinc",
+                "-include", "/usr/src/linux-headers-5.19.0-41-generic/include/linux/kconfig.h",
+                "-include", "/usr/src/linux-headers-5.19.0-41-generic/include/linux/compiler_types.h"
+            ]
+        }
+    ],
+    "version": 4
+}
