@@ -9,7 +9,7 @@
 MODULE_LICENSE("Dual MIT/GPL");
 
 static int deviceMajorNum = 0;
-static struct dendisk* deviceGenDisk = NULL;
+static struct gendisk* deviceGenDisk = NULL;
 static struct request_queue* deviceQueue = NULL;
 
 static int  simpleDrv_api_open(struct block_device* device, fmode_t mode);
@@ -27,19 +27,64 @@ int __init simpleDrv_init(void)
 {
     DBGMSG("simpleDrv_init called\n");
     deviceMajorNum = register_blkdev(DEVICE_MAJOR, DEVICE_NAME);
-
     if(deviceMajorNum < 0)
     {
         DBGERR("Unable to register device!\n");
         return -EBUSY;
     }
+    else
+        DBGMSG("Device Major = %d\n", deviceMajorNum);
+
+    deviceGenDisk = blk_alloc_disk(DEVICE_DISK_MINOR);
+    if(deviceGenDisk == NULL)
+    {
+        DBGERR("Unable to allocate disk!\n");
+        return -ENOMEM;
+    }
+
+    deviceGenDisk->major = deviceMajorNum;
+    deviceGenDisk->first_minor = 0;
+    deviceGenDisk->minors = DEVICE_DISK_MINOR;
+    deviceGenDisk->fops = &simpleDrv_block_fuctions;
+    //deviceGenDisk->queue = blk_init_queque
+    deviceGenDisk->flags = GENHD_FL_NO_PART;
     
+    strcpy(deviceGenDisk->disk_name, DEVICE_NAME"0");
+    set_capacity(deviceGenDisk, DEVICE_BUFFER_SIZE*512);
+    add_disk(deviceGenDisk);
+
+    //memset(deviceBuff)
+    //deviceDataLength = 0;
+
+    DBGMSG("simpleDrv_init completed\n");
     return 0;
 }
 void __exit simpleDrv_exit(void)
 {
-    unregister_blkdev(deviceMajorNum, DEVICE_NAME);
     DBGMSG("simpleDrv_exit called\n");
+
+    del_gendisk(deviceGenDisk);
+    put_disk(deviceGenDisk);
+
+    unregister_blkdev(deviceMajorNum, DEVICE_NAME);
+    //blk_cleanup_queue(deviceMajorNum->qieue);   
+}
+
+static int  simpleDrv_api_open(struct block_device* device, fmode_t mode)
+{
+    DBGMSG("simpleDrv_api_open called\n");
+    return 0;
+}
+
+static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode)
+{
+    DBGMSG("simpleDrv_api_release called\n");
+}
+
+static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg)
+{
+    DBGMSG("simpleDrv_api_ioctl called\n");
+    return 0;
 }
 
 module_init(simpleDrv_init);

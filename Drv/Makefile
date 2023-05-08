@@ -13,7 +13,7 @@ clean:
 	make -C /lib/modules/$(KERNEL)/build M=$(PWD) clean
 
 install:
-	sudo insmod DRVeerdnA.ko
+	sudo insmod $(TARGET).ko
 
 uninstall:
-	sudo rmmod DRVeerdnA
+	sudo rmmod $(TARGET)

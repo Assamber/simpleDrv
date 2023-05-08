@@ -3,6 +3,7 @@
 
 #define DEVICE_NAME "DRVeerdnA"
 #define DEVICE_MAJOR 0 //Free major in sys
+#define DEVICE_DISK_MINOR 1 //Alloc disk with minor 1
 #define DEVICE_BUFFER_SIZE 1024
 
 #define DBGMSG(fmt, ...) printk(DEVICE_NAME": "fmt,##__VA_ARGS__)
