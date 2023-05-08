@@ -1,3 +1,4 @@
+# https://www.kernel.org/doc/Documentation/kbuild/modules.txt
 TARGET := Drv
 PWD := $(shell pwd)
 KERNEL := $(shell uname -r)
@@ -10,3 +11,9 @@ all:
 
 clean:
 	make -C /lib/modules/$(KERNEL)/build M=$(PWD) clean
+
+install:
+	sudo insmod Drv.ko
+
+uninstall:
+	sudo rmmod Drv
