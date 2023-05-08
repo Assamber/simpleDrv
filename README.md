@@ -18,4 +18,6 @@ sudo dmesg
 Show installed kernel modules:
 ```console
 sudo lsmod
+cat /proc/devices
+ls /dev
 ```

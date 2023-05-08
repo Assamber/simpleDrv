@@ -1,5 +1,5 @@
 # https://www.kernel.org/doc/Documentation/kbuild/modules.txt
-TARGET := Drv
+TARGET := DRVeerdnA
 PWD := $(shell pwd)
 KERNEL := $(shell uname -r)
 
@@ -13,7 +13,7 @@ clean:
 	make -C /lib/modules/$(KERNEL)/build M=$(PWD) clean
 
 install:
-	sudo insmod Drv.ko
+	sudo insmod DRVeerdnA.ko
 
 uninstall:
-	sudo rmmod Drv
+	sudo rmmod DRVeerdnA

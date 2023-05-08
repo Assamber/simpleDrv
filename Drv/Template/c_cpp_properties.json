@@ -17,7 +17,8 @@
                 "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include/uapi",
                 "/usr/src/linux-headers-5.19.0-41-generic/arch/x86/include/generated/uapi",
                 "/usr/src/linux-headers-5.19.0-41-generic/ubuntu/include",
-                "/usr/lib/gcc/x86_64-linux-gnu/11/include"
+                "/usr/lib/gcc/x86_64-linux-gnu/11/include",
+                "/usr/include"
             ],
             "defines": [
                 "__GNUC__",
