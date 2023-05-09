@@ -35,7 +35,7 @@ int __init simpleDrv_init(void)
     if(deviceMajorNum < 0)
     {
         DBGERR("Unable to register device!\n");
-        return -EBUSY;
+        goto out_err;
     }
     else
         DBGMSG("Device Major = %d\n", deviceMajorNum);
@@ -44,16 +44,14 @@ int __init simpleDrv_init(void)
     if(deviceGenDisk == NULL)
     {
         DBGERR("Unable to allocate disk!\n");
-        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
-        return -ENOMEM;
+        goto out_err_allocate_disk;
     }
 
     mainBuffer = kzalloc(DEVICE_BUFFER_SIZE, GFP_KERNEL);
     if(mainBuffer == NULL)
     {       
         DBGERR("Unable to allocate memory buffer!\n");
-        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
-        return -ENOMEM;
+        goto out_err_allocate_memory;
     }
     deviceDataLength = 0;
 
@@ -72,23 +70,34 @@ int __init simpleDrv_init(void)
     if(err)
     {
         DBGERR("Unable to add disk!\n");
-        kfree(mainBuffer);
-        put_disk(deviceGenDisk);
-        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
-        return -ENOMEM;
+        goto out_err_add_disk;
     }
 
     DBGMSG("simpleDrv_init completed\n");
     return 0;
+
+out_err_add_disk:
+    kfree(mainBuffer);
+out_err_allocate_memory:
+    put_disk(deviceGenDisk);
+out_err_allocate_disk:
+    unregister_blkdev(deviceMajorNum, DEVICE_NAME);
+out_err:
+    return -ENOMEM;
 }
+
 void __exit simpleDrv_exit(void)
 {
     DBGMSG("simpleDrv_exit called\n");
 
-    kfree(mainBuffer);
+    if(mainBuffer)
+        kfree(mainBuffer);
 
-    del_gendisk(deviceGenDisk);
-    put_disk(deviceGenDisk);
+    if(deviceGenDisk)
+    {   
+        del_gendisk(deviceGenDisk);
+        put_disk(deviceGenDisk);
+    }
 
     unregister_blkdev(deviceMajorNum, DEVICE_NAME);
     //blk_cleanup_queue(deviceMajorNum->qieue);   
@@ -108,6 +117,7 @@ static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode)
 static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg)
 {
     simpleDrv_ioctl_data_t* data = NULL;
+    int length = 0;
 
     DBGMSG("simpleDrv_ioctl called\n");
 
@@ -116,14 +126,34 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
     switch (cmd)
     {
         case IOCTL_BLOCK_DRV_GET:
-             DBGMSG("IOCTL_GET called\n"); break;
+             DBGMSG("IOCTL_GET called\n"); 
+             length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
+             memcpy(data->outputData, mainBuffer, length);
+             break;
+
         case IOCTL_BLOCK_DRV_SET:
-             DBGMSG("IOCTL_SET called\n"); break;
+             DBGMSG("IOCTL_SET called\n");
+             length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
+             memcpy(mainBuffer, data->inputData, length);
+             deviceDataLength = length;
+             break;
+
         case IOCTL_BLOCK_DRV_GET_AND_SET:
-             DBGMSG("IOCTL_GET_AND_SET called\n"); break;
-        case IOCLT_BLOCK_DRV_DBG_MESSAGE:
-             DBGMSG("IOCTL_DBG called\n"); break;
-    
+             DBGMSG("IOCTL_GET_AND_SET called\n");
+             length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
+             memcpy(data->outputData, mainBuffer, length);
+
+             length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
+             memcpy(mainBuffer, data->inputData, length);
+             deviceDataLength = length;
+             break;
+
+        case IOCTL_BLOCK_DRV_DBG_MESSAGE:
+             DBGMSG("IOCTL_DBG called\n");
+             if(deviceDataLength)
+                DBGMSG("MSG: %s\n", mainBuffer);
+             break;
+
         default: break;
     }
 

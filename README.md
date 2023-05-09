@@ -1,6 +1,6 @@
 # Simple Block Driver
 
-Simple example of block driver. In Template dir you can find settigns for vscode c_cpp plugin. Change paths for you current one.
+Simple example of block driver. In Template dir you can find settigns for vscode c_cpp plugin. Change paths for you current one. Installed linux header need to be compiled.
 
 ## Prepare
 ```console
@@ -24,17 +24,19 @@ Show debug messages:
 ```console
 sudo dmesg
 ```
-Show installed kernel modules:
+Show information about kernel module:
 ```console
 sudo lsmod
 cat /proc/devices
 ls /dev
 sudo fdisk -l
 cat /proc/partition
+blockdev --getsize64 /dev/DRiVeerDNA0
 ```
 
 ## Useful Links
 
 * [The Linux Kernel. Block Deivce Drivers](https://linux-kernel-labs.github.io/refs/heads/master/labs/block_device_drivers.html)
-*  [Habr. Simple Block Device for Kernel 5.0](https://habr.com/ru/companies/veeam/articles/446148/)
 * [Linux Device Drivers. Third Edition](https://bootlin.com/doc/books/ldd3.pdf)
+* [The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/)
+* [Habr. Simple Block Device for Kernel 5.0](https://habr.com/ru/companies/veeam/articles/446148/)
