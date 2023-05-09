@@ -12,6 +12,8 @@ MODULE_LICENSE("Dual MIT/GPL");
 static int deviceMajorNum = 0;
 static struct gendisk* deviceGenDisk = NULL;
 static struct request_queue* deviceQueue = NULL;
+static int deviceDataLength = 0;
+static unsigned char* mainBuffer = 0;
 
 static int  simpleDrv_api_open(struct block_device* device, fmode_t mode);
 static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode);
@@ -26,6 +28,8 @@ static struct block_device_operations simpleDrv_block_fuctions = {
 
 int __init simpleDrv_init(void)
 {
+    int err = 0;
+
     DBGMSG("simpleDrv_init called\n");
     deviceMajorNum = register_blkdev(DEVICE_MAJOR, DEVICE_NAME);
     if(deviceMajorNum < 0)
@@ -40,8 +44,18 @@ int __init simpleDrv_init(void)
     if(deviceGenDisk == NULL)
     {
         DBGERR("Unable to allocate disk!\n");
+        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
         return -ENOMEM;
     }
+
+    mainBuffer = kzalloc(DEVICE_BUFFER_SIZE, GFP_KERNEL);
+    if(mainBuffer == NULL)
+    {       
+        DBGERR("Unable to allocate memory buffer!\n");
+        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
+        return -ENOMEM;
+    }
+    deviceDataLength = 0;
 
     deviceGenDisk->major = deviceMajorNum;
     deviceGenDisk->first_minor = 0;
@@ -51,11 +65,18 @@ int __init simpleDrv_init(void)
     deviceGenDisk->flags = GENHD_FL_NO_PART;
     
     strcpy(deviceGenDisk->disk_name, DEVICE_NAME"0");
-    set_capacity(deviceGenDisk, DEVICE_BUFFER_SIZE*512);
-    add_disk(deviceGenDisk);
+    set_capacity(deviceGenDisk, NR_SECTORS);
 
-    //memset(deviceBuff)
-    //deviceDataLength = 0;
+    //Last step activate drv func
+    err = add_disk(deviceGenDisk); 
+    if(err)
+    {
+        DBGERR("Unable to add disk!\n");
+        kfree(mainBuffer);
+        put_disk(deviceGenDisk);
+        unregister_blkdev(deviceMajorNum, DEVICE_NAME);
+        return -ENOMEM;
+    }
 
     DBGMSG("simpleDrv_init completed\n");
     return 0;
@@ -63,6 +84,8 @@ int __init simpleDrv_init(void)
 void __exit simpleDrv_exit(void)
 {
     DBGMSG("simpleDrv_exit called\n");
+
+    kfree(mainBuffer);
 
     del_gendisk(deviceGenDisk);
     put_disk(deviceGenDisk);
@@ -84,9 +107,11 @@ static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode)
 
 static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg)
 {
+    simpleDrv_ioctl_data_t* data = NULL;
+
     DBGMSG("simpleDrv_ioctl called\n");
 
-    simpleDrv_ioctl_data_t* data = (simpleDrv_ioctl_data_t*)arg;
+    data = (simpleDrv_ioctl_data_t*)arg;
 
     switch (cmd)
     {
