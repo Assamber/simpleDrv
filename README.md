@@ -20,4 +20,6 @@ Show installed kernel modules:
 sudo lsmod
 cat /proc/devices
 ls /dev
+sudo fdisk -l
+cat /proc/partition
 ```

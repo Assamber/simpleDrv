@@ -1,5 +1,5 @@
 # https://www.kernel.org/doc/Documentation/kbuild/modules.txt
-TARGET := DRVeerdnA
+TARGET := DRiVeerDNA
 PWD := $(shell pwd)
 KERNEL := $(shell uname -r)
 

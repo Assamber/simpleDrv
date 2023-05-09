@@ -5,6 +5,7 @@
 #include <linux/blkdev.h>
 
 #include "drv_src.h"
+#include "drv_ioctl.h"
 
 MODULE_LICENSE("Dual MIT/GPL");
 
@@ -72,18 +73,35 @@ void __exit simpleDrv_exit(void)
 
 static int  simpleDrv_api_open(struct block_device* device, fmode_t mode)
 {
-    DBGMSG("simpleDrv_api_open called\n");
+    DBGMSG("simpleDrv_open called\n");
     return 0;
 }
 
 static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode)
 {
-    DBGMSG("simpleDrv_api_release called\n");
+    DBGMSG("simpleDrv_release called\n");
 }
 
 static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg)
 {
-    DBGMSG("simpleDrv_api_ioctl called\n");
+    DBGMSG("simpleDrv_ioctl called\n");
+
+    simpleDrv_ioctl_data_t* data = (simpleDrv_ioctl_data_t*)arg;
+
+    switch (cmd)
+    {
+        case IOCTL_BLOCK_DRV_GET:
+             DBGMSG("IOCTL_GET called\n"); break;
+        case IOCTL_BLOCK_DRV_SET:
+             DBGMSG("IOCTL_SET called\n"); break;
+        case IOCTL_BLOCK_DRV_GET_AND_SET:
+             DBGMSG("IOCTL_GET_AND_SET called\n"); break;
+        case IOCLT_BLOCK_DRV_DBG_MESSAGE:
+             DBGMSG("IOCTL_DBG called\n"); break;
+    
+        default: break;
+    }
+
     return 0;
 }
 

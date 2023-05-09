@@ -1,7 +1,6 @@
 #ifndef __DRV_IOCTL_H__
 #define __DRV_IOCTL_H__
 
-#include <linux/init.h>
 #include <linux/ioctl.h>
 
 #define BLOCK_DRV_MAGIC 0xAF
@@ -13,7 +12,7 @@
 
 typedef struct simpleDrv_ioctl_data_s
 {
-    char*  nputData;
+    char*  inputData;
     size_t inputLength;
     char*  outputData;
     size_t outputLength;
@@ -23,6 +22,6 @@ typedef struct simpleDrv_ioctl_data_s
 #define IOCTL_BLOCK_DRV_GET _IOR(BLOCK_DRV_MAGIC, BLOCK_DRV_GET, char*)
 #define IOCTL_BLOCK_DRV_SET _IOW(BLOCK_DRV_MAGIC, BLOCK_DRV_SET, char*)
 #define IOCTL_BLOCK_DRV_GET_AND_SET _IOWR(BLOCK_DRV_MAGIC, BLOCK_DRV_GET_AND_SET, char*)
-#define IOCLT_BLOCK_DRV_DBG_MESSAGE _IO(BLOCK_DRV_MAGIC, BLOCK_DRV_DBG_MESSAGE);
+#define IOCLT_BLOCK_DRV_DBG_MESSAGE _IO(BLOCK_DRV_MAGIC, BLOCK_DRV_DBG_MESSAGE)
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef __DRV_SRC_H__
 #define __DRV_SRC_H__
 
-#define DEVICE_NAME "DRVeerdnA"
+#define DEVICE_NAME "DRiVeerDNA"
 #define DEVICE_MAJOR 0 //Free major in sys
 #define DEVICE_DISK_MINOR 1 //Alloc disk with minor 1
 #define DEVICE_BUFFER_SIZE 1024
