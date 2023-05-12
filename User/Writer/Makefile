@@ -1,6 +1,6 @@
 #https://stackoverflow.com/questions/1484817/how-do-i-make-a-simple-makefile-for-gcc-on-linux
 
-TARGET = injector
+TARGET = writer
 LIBS = -lm
 CC = gcc
 CFLAGS = -g -Wall

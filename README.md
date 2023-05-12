@@ -40,3 +40,5 @@ blockdev --getsize64 /dev/DRiVeerDNA0
 * [Linux Device Drivers. Third Edition](https://bootlin.com/doc/books/ldd3.pdf)
 * [The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/)
 * [Habr. Simple Block Device for Kernel 5.0](https://habr.com/ru/companies/veeam/articles/446148/)
+* [Linux kernel. Block I/O Layer](https://www.cs.cornell.edu/courses/cs4410/2021fa/assets/material/lecture24_blk_layer.pdf)
+* [Bootlin. Block Device Drivers](https://bootlin.com/doc/legacy/block-drivers/block_drivers.pdf)
