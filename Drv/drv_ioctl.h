@@ -16,7 +16,7 @@ typedef struct simpleDrv_ioctl_data_s
     size_t inputLength;
     char*  outputData;
     size_t outputLength;
-
+    size_t* returnedSize;
 }simpleDrv_ioctl_data_t;
 
 #define IOCTL_BLOCK_DRV_GET _IOR(BLOCK_DRV_MAGIC, BLOCK_DRV_GET, char*)

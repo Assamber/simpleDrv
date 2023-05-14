@@ -4,5 +4,16 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"module.h": "c",
+			"blkdev.h": "c",
+			"drv_ioctl.h": "c",
+			"errno.h": "c",
+			"error_t.h": "c",
+			"semaphore.h": "c",
+			"fs.h": "c",
+			"blk-mq.h": "c"
+		}
+	}
 }

@@ -11,13 +11,12 @@ MODULE_LICENSE("Dual MIT/GPL");
 
 static int deviceMajorNum = 0;
 static struct gendisk* deviceGenDisk = NULL;
-static struct request_queue* deviceQueue = NULL;
 static int deviceDataLength = 0;
 static unsigned char* mainBuffer = 0;
 
 static int  simpleDrv_api_open(struct block_device* device, fmode_t mode);
 static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode);
-static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg);
+static int  simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg);
 
 static struct block_device_operations simpleDrv_block_fuctions = {
     .owner = THIS_MODULE,
@@ -59,7 +58,7 @@ int __init simpleDrv_init(void)
     deviceGenDisk->first_minor = 0;
     deviceGenDisk->minors = DEVICE_DISK_MINOR;
     deviceGenDisk->fops = &simpleDrv_block_fuctions;
-    //deviceGenDisk->queue = blk_init_queque
+    //deviceGenDisk->queue = Allocated queue (Can see in Template/queue.c)
     deviceGenDisk->flags = GENHD_FL_NO_PART;
     
     strcpy(deviceGenDisk->disk_name, DEVICE_NAME"0");
@@ -100,7 +99,6 @@ void __exit simpleDrv_exit(void)
     }
 
     unregister_blkdev(deviceMajorNum, DEVICE_NAME);
-    //blk_cleanup_queue(deviceMajorNum->qieue);   
 }
 
 static int  simpleDrv_api_open(struct block_device* device, fmode_t mode)
@@ -126,31 +124,42 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
     switch (cmd)
     {
         case IOCTL_BLOCK_DRV_GET:
-             DBGMSG("IOCTL_GET called\n"); 
+             DBGMSG("IOCTL_GET called\n");
+             if(data->outputData == NULL) break;
+
              length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
              memcpy(data->outputData, mainBuffer, length);
+             if(data->returnedSize != NULL) *data->returnedSize = length;
              break;
 
         case IOCTL_BLOCK_DRV_SET:
              DBGMSG("IOCTL_SET called\n");
+             if(data->inputData == NULL) break;
+
              length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
+             memset(mainBuffer, 0x00, DEVICE_BUFFER_SIZE);
              memcpy(mainBuffer, data->inputData, length);
              deviceDataLength = length;
              break;
 
         case IOCTL_BLOCK_DRV_GET_AND_SET:
              DBGMSG("IOCTL_GET_AND_SET called\n");
+             if(data->inputData == NULL) break;
+             if(data->outputData == NULL) break;
+
              length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
              memcpy(data->outputData, mainBuffer, length);
+             if(data->returnedSize != NULL) *data->returnedSize = length;
 
              length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
+             memset(mainBuffer, 0x00, DEVICE_BUFFER_SIZE);
              memcpy(mainBuffer, data->inputData, length);
              deviceDataLength = length;
              break;
 
         case IOCTL_BLOCK_DRV_DBG_MESSAGE:
              DBGMSG("IOCTL_DBG called\n");
-             if(deviceDataLength)
+             if(deviceDataLength > 0)
                 DBGMSG("MSG: %s\n", mainBuffer);
              break;
 

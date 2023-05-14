@@ -14,10 +14,13 @@
 #define SHARED_BUFFER_NAME "myBuffer"
 #define SEMAPHORE_NAME "mySemaphore"
 
+#define SIGNAL_SEND_READY(groupID) kill(-groupID, SIGUSR2)
+
 int shMem = 0;
 void* addr = NULL;
 sem_t* sem = NULL;
 int cmd = 0;
+pid_t pgID = 0;
 
 void err_show(void)
 {
@@ -78,6 +81,12 @@ void signalHandler(int signum)
 int main(void)
 {
     int err;
+    
+    signal(SIGURG,  signalHandler);
+    signal(SIGUSR1, signalHandler);
+    signal(SIGUSR2, SIG_IGN);
+    pgID = getpgid(0);
+
     printf("Viewer has been started with ID = %d, and group = %d\n", getpid(), getpgid(0));
 
     err = shared_mem_open();
@@ -96,12 +105,11 @@ int main(void)
         shared_mem_close();
         return -1;
     }
-
-    signal(SIGURG, signalHandler);
-    signal(SIGUSR1, signalHandler);
-
+    
     while(1)
     {
+        printf("Viewer: Wait new signal...\n");
+        SIGNAL_SEND_READY(pgID);
         pause();
         printf("Viewer: Get new signal...\n");
         if(cmd_routune()) break;
