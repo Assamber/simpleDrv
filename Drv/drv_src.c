@@ -115,7 +115,7 @@ static void simpleDrv_api_release(struct gendisk* genDisk, fmode_t mode)
 static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsigned int cmd, unsigned long arg)
 {
     simpleDrv_ioctl_data_t* data = NULL;
-    int length = 0;
+    int length = 0, testLength = 0;
 
     DBGMSG("simpleDrv_ioctl called\n");
 
@@ -128,8 +128,9 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
              if(data->outputData == NULL) break;
 
              length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
-             memcpy(data->outputData, mainBuffer, length);
-             if(data->returnedSize != NULL) *data->returnedSize = length;
+             testLength = copy_to_user(data->outputData, mainBuffer, length);
+             if(testLength) DBGERR("Fail copy to user!\n");
+             if(data->returnedSize != NULL) *data->returnedSize = length - testLength;
              break;
 
         case IOCTL_BLK_SET:
@@ -138,8 +139,9 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
 
              length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
              memset(mainBuffer, 0x00, DEVICE_BUFFER_SIZE);
-             memcpy(mainBuffer, data->inputData, length);
-             deviceDataLength = length;
+             testLength = copy_from_user(mainBuffer, data->inputData, length);
+             if(testLength) DBGERR("Fail copy from user!\n");
+             deviceDataLength = length - testLength;
              break;
 
         case IOCTL_BLK_GET_AND_SET:
@@ -148,13 +150,15 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
              if(data->outputData == NULL) break;
 
              length = deviceDataLength < data->outputLength ? deviceDataLength : data->outputLength;
-             memcpy(data->outputData, mainBuffer, length);
-             if(data->returnedSize != NULL) *data->returnedSize = length;
+             testLength = copy_to_user(data->outputData, mainBuffer, length);
+             if(testLength) DBGERR("Fail copy to user!\n");
+             if(data->returnedSize != NULL) *data->returnedSize = length - testLength;
 
              length = data->inputLength < DEVICE_BUFFER_SIZE ? data->inputLength : DEVICE_BUFFER_SIZE;
              memset(mainBuffer, 0x00, DEVICE_BUFFER_SIZE);
-             memcpy(mainBuffer, data->inputData, length);
-             deviceDataLength = length;
+             testLength = copy_from_user(mainBuffer, data->inputData, length);
+             if(testLength) DBGERR("Fail copy from user!\n");
+             deviceDataLength = length - testLength;
              break;
 
         case IOCTL_BLK_DBG_MSG:
