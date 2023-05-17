@@ -110,10 +110,17 @@ int start_viewer(void)
     return 0;
 }
 
-void shared_mem_write(void)
+void shared_mem_write(void* dataBuff, int size)
 {
-    sem_wait(sem);
+    if(size > SHARED_BUFFER_SIZE)
+    {
+        printf("Writer: Size more than shared buffer size");
+        return;
+    }
 
+    sem_wait(sem);
+    memset(addrShMem, 0, SHARED_BUFFER_SIZE);
+    memcpy(addrShMem, dataBuff, size);
     sem_post(sem);
 }
 
@@ -162,6 +169,7 @@ int main(void)
     pid_t pgID = getpgid(0);
 
     //TEST ROUTINE
+    char tempBuff[SHARED_BUFFER_SIZE] = {0};
     size_t returnedSize = 0;
     simpleDrv_ioctl_data_t data = {0};
     data.returnedSize = &returnedSize;
@@ -170,22 +178,25 @@ int main(void)
     data.inputData = "Set this message to driver buffer!";
     data.inputLength = strlen(data.inputData) + 1;
     printf("Writer: Print message in debug from driver\n");
-    ioctl(device, IOCTL_BLOCK_DRV_SET, &data);
-    ioctl(device, IOCTL_BLOCK_DRV_DBG_MESSAGE, &data);
+    ioctl(device, IOCTL_BLK_SET, &data);
+    ioctl(device, IOCTL_BLK_DBG_MSG, &data);
 
     signalWait();
     data.inputData = "New message to see...";
     data.inputLength = strlen(data.inputData) + 1;
-    data.outputData = addrShMem;
+    data.outputData = tempBuff;
     data.outputLength = SHARED_BUFFER_SIZE;
-    ioctl(device, IOCTL_BLOCK_DRV_GET_AND_SET, &data);
+    ioctl(device, IOCTL_BLK_GET_AND_SET, &data);
+    shared_mem_write(tempBuff, returnedSize);
     printf("Writer: Get old message from driver and send new.\n");
     SIGNAL_SEND_DATA(pgID);
 
     signalWait();
-    data.outputData = addrShMem;
+    memset(tempBuff, 0, SHARED_BUFFER_SIZE);
+    data.outputData = tempBuff;
     data.outputLength = SHARED_BUFFER_SIZE;
-    ioctl(device, IOCTL_BLOCK_DRV_GET, &data);
+    ioctl(device, IOCTL_BLK_GET, &data);
+    shared_mem_write(tempBuff, returnedSize);
     printf("Writer: Get new message from driver.\n");
     SIGNAL_SEND_DATA(pgID);
     //END TEST ROUTUNE

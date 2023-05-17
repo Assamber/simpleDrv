@@ -123,7 +123,7 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
 
     switch (cmd)
     {
-        case IOCTL_BLOCK_DRV_GET:
+        case IOCTL_BLK_GET:
              DBGMSG("IOCTL_GET called\n");
              if(data->outputData == NULL) break;
 
@@ -132,7 +132,7 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
              if(data->returnedSize != NULL) *data->returnedSize = length;
              break;
 
-        case IOCTL_BLOCK_DRV_SET:
+        case IOCTL_BLK_SET:
              DBGMSG("IOCTL_SET called\n");
              if(data->inputData == NULL) break;
 
@@ -142,7 +142,7 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
              deviceDataLength = length;
              break;
 
-        case IOCTL_BLOCK_DRV_GET_AND_SET:
+        case IOCTL_BLK_GET_AND_SET:
              DBGMSG("IOCTL_GET_AND_SET called\n");
              if(data->inputData == NULL) break;
              if(data->outputData == NULL) break;
@@ -157,7 +157,7 @@ static int simpleDrv_api_ioctl(struct block_device* device, fmode_t mode, unsign
              deviceDataLength = length;
              break;
 
-        case IOCTL_BLOCK_DRV_DBG_MESSAGE:
+        case IOCTL_BLK_DBG_MSG:
              DBGMSG("IOCTL_DBG called\n");
              if(deviceDataLength > 0)
                 DBGMSG("MSG: %s\n", mainBuffer);
