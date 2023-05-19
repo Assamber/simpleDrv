@@ -116,5 +116,5 @@ int main(void)
     }
 
     printf("Viewer: Close...\n");
-    //shared_mem_close();
+    shared_mem_close();
 }

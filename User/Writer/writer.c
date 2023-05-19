@@ -131,7 +131,7 @@ int main(void)
     
     signal(SIGURG, SIG_IGN);
     signal(SIGUSR1, SIG_IGN);
-    signal(SIGUSR2, SIG_IGN);
+    signal(SIGUSR2, signalHandler);
 
     printf("Writer: has been started with ID = %d, with group = %d\n", getpid(), getpgid(0));
 
